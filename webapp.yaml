@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: webapp-deployment
+  labels:
+    app: webapp
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: webapp
+  template:
+    metadata:
+      labels:
+        app: webapp
+    spec:
+      containers:
+      - name: webapp
+        image: nanajanashia/k8s-demo-app:v1.0 #publicly accessible on dockerhub, tag: v1.0
+        ports:
+        - containerPort: 3000 # node app created that listens on port 3000 
+        env:
+        - name: USER_NAME
+          valueFrom:
+            secretKeyRef:
+              name: mongo-secret #secret.yaml-name: mongo-secret
+              key: mongo-user #secret.yaml 
+        - name: USER_PWD
+          valueFrom:
+            secretKeyRef:
+              name: mongo-secret
+              key: mongo-password
+        - name: DB_URL
+          valueFrom:
+            configMapKeyRef:
+              name: mongo-config
+              key: mongo-url       
+
+# kind: Deployment
+# blueprint for pods
+# template- configurations for Pod
+#   container: image
+#              port 
+
+---
+apiVersion: v1
+kind: Service # load balancer, forward traffic
+metadata:
+  name: webapp-service
+spec:
+  type: NodePort # external service type
+  selector:
+    app: webapp
+  ports:
+    - protocol: TCP
+      port: 3000 # does not matter what port, can be 80, 8080, etc.
+      targetPort: 3000 # always containerPort, the port the service should forward requests to
+      #- internal port
+      nodePort: 30100  #from kubernetes offical doc: range 30000-32767

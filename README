@@ -1,0 +1,7 @@
+This repo is to practice Kubernetes basic for self learning purpose
+
+4 files 
+1. ConfigMap - MongoDB endpt
+2. Secret - MongoDB user&pw 
+3. Deployment&Service - MongoDB application with internal Service
+3. Deployment&Service - Our own WebApp with external Service
